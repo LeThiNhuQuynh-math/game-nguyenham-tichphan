@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Ôn Nguyên hàm – Tích phân</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>🎮 ÔN TẬP NGUYÊN HÀM – TÍCH PHÂN</h1>
+
+<div id="game"></div>
+
+<p id="score"></p>
+
+<script src="script.js"></script>
+</body>
+</html>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2ff;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  color: #1e3a8a;
+}
+
+button {
+  margin: 6px;
+  padding: 8px 14px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+input {
+  padding: 6px;
+  font-size: 15px;
+}
+let round = 1;
+let index = 0;
+let score = 0;
+
+/* ========== VÒNG 1: TRẮC NGHIỆM ========== */
+const round1 = [
+ {q:"Nguyên hàm của x^3 là:", options:["x^4+C","x^4/4+C","3x^2+C","x^3/3+C"], a:1},
+ {q:"∫ 2x dx =", options:["x^2+C","2x^2+C","x+C","2x+C"], a:0},
+ {q:"Nguyên hàm của cos x là:", options:["-sin x+C","cos x+C","sin x+C","-cos x+C"], a:2},
+ {q:"∫ 1/x dx (x>0) =", options:["ln x+C","ln|x|+C","1/x^2+C","x+C"], a:0},
+ {q:"Nguyên hàm của e^x là:", options:["xe^x+C","e^x+C","ln x+C","x+C"], a:1},
+ {q:"∫(3x^2−4)dx =", options:["x^3−4x+C","3x^3−4+C","x^3−4+C","6x−4+C"], a:0},
+ {q:"Nếu F'(x)=f(x) thì F(x) là:", options:["Đạo hàm","Tích phân","Nguyên hàm","Đồ thị"], a:2},
+ {q:"∫x⁻² dx =", options:["−x⁻¹+C","x⁻¹+C","−2x⁻¹+C","ln x+C"], a:0},
+ {q:"Nguyên hàm của 2x+1 là:", options:["x^2+x+C","2x^2+x+C","x^2+1+C","2x+1+C"], a:0},
+ {q:"∫ sin x dx =", options:["cos x+C","−sin x+C","−cos x+C","sin x+C"], a:2},
+ {q:"Tập hợp các nguyên hàm gọi là:", options:["Tích phân","Họ nguyên hàm","Hàm liên tục","Hàm sơ cấp"], a:1},
+ {q:"∫0 dx =", options:["0","1","x","C"], a:3}
+];
+
+function showRound1() {
+  let q = round1[index];
+  let html = `<h2>Vòng 1 – Trắc nghiệm</h2><p>Câu ${index+1}. ${q.q}</p>`;
+  q.options.forEach((o,i)=>{
+    html += `<button onclick="check1(${i})">${o}</button><br>`;
+  });
+  document.getElementById("game").innerHTML = html;
+}
+
+function check1(c){
+  if(c===round1[index].a) score++;
+  index++;
+  index<round1.length ? showRound1() : nextRound();
+}
+
+/* ========== VÒNG 2: ĐÚNG / SAI ========== */
+const round2 = [
+ {
+  q:"Cho f(x)=x²",
+  i:[
+   {t:"Một nguyên hàm là x³/3 + C",c:true},
+   {t:"∫f(x)dx = x³ + C",c:false},
+   {t:"f(x) có vô số nguyên hàm",c:false},
+   {t:"f(x) liên tục trên R",c:true}
+  ]
+ },
+ {
+  q:"Xét các mệnh đề sau",
+  i:[
+   {t:"F'(x)=f(x) ⇒ F(x) là nguyên hàm",c:true},
+   {t:"Hai nguyên hàm hơn kém nhau hằng số",c:true},
+   {t:"∫cos x dx = −sin x + C",c:false},
+   {t:"∫e^x dx = e^x + C",c:true}
+  ]
+ },
+ {
+  q:"Cho f(x)=1/x (x>0)",
+  i:[
+   {t:"Một nguyên hàm là ln x + C",c:true},
+   {t:"f(x) không có nguyên hàm",c:false},
+   {t:"∫f(x)dx = ln|x| + C",c:false},
+   {t:"f(x) liên tục trên (0;+∞)",c:true}
+  ]
+ },
+ {
+  q:"Xét các tích phân",
+  i:[
+   {t:"∫(x+1)dx = x²/2 + x + C",c:true},
+   {t:"∫2x dx = x² + C",c:true},
+   {t:"∫sin x dx = cos x + C",c:false},
+   {t:"∫5 dx = 5x + C",c:true}
+  ]
+ }
+];
+
+function showRound2(){
+ let q=round2[index];
+ let html=`<h2>Vòng 2 – Đúng / Sai</h2><p>${q.q}</p>`;
+ q.i.forEach((x,i)=>{
+  html+=`<label><input type="checkbox" id="r2${i}"> ${"abcd"[i]}. ${x.t}</label><br>`;
+ });
+ html+=`<button onclick="check2()">Nộp</button>`;
+ document.getElementById("game").innerHTML=html;
+}
+
+function check2(){
+ let q=round2[index];
+ q.i.forEach((x,i)=>{
+  if(document.getElementById(`r2${i}`).checked===x.c) score++;
+ });
+ index++;
+ index<round2.length ? showRound2() : nextRound();
+}
+
+/* ========== VÒNG 3: TRẢ LỜI NGẮN ========== */
+const round3 = [
+ {q:"∫4x dx =",a:"2x^2+C"},
+ {q:"Nguyên hàm của 3x² là:",a:"x^3+C"},
+ {q:"∫e^x dx =",a:"e^x+C"},
+ {q:"∫cos x dx =",a:"sin x+C"},
+ {q:"∫1/x dx (x>0) =",a:"lnx+C"},
+ {q:"F'(x)=2x−1. Tìm F(x)",a:"x^2-x+C"}
+];
+
+function showRound3(){
+ let q=round3[index];
+ document.getElementById("game").innerHTML=
+ `<h2>Vòng 3 – Trả lời ngắn</h2>
+ <p>${q.q}</p>
+ <input id="short">
+ <button onclick="check3()">Trả lời</button>`;
+}
+
+function check3(){
+ let u=document.getElementById("short").value.replace(/\s/g,"");
+ let c=round3[index].a.replace(/\s/g,"");
+ if(u===c) score++;
+ index++;
+ index<round3.length ? showRound3() : endGame();
+}
+
+/* ========== ĐIỀU KHIỂN ========== */
+function nextRound(){
+ index=0;
+ round++;
+ if(round===2) showRound2();
+ else if(round===3) showRound3();
+}
+
+function endGame(){
+ document.getElementById("game").innerHTML=
+ `<h2>🎉 Hoàn thành!</h2><p>Điểm của bạn: ${score}</p>`;
+}
+
+showRound1();
