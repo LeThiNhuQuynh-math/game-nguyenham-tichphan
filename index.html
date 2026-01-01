@@ -3,284 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn tập Nguyên hàm - Tích phân</title>
+    <title>Game Toán 12 - Nguyên hàm Tích phân</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
     <style>
-        :root {
-            --primary: #1e88e5;
-            --success: #4caf50;
-            --error: #f44336;
-            --bg: #f5f7fa;
-            --text: #2c3e50;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            background: white;
-            width: 100%;
-            max-width: 700px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            padding: 30px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            color: var(--primary);
-            font-size: 24px;
-            margin: 0;
-        }
-
-        #stats {
-            color: #7f8c8d;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        /* Thanh tiến trình */
-        .progress-container {
-            background: #ecf0f1;
-            height: 10px;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #1e88e5, #42a5f5);
-            width: 0%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-
-        .question-box {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: var(--text);
-            margin-bottom: 25px;
-            line-height: 1.6;
-            text-align: left;
-        }
-
-        .options-grid {
-            display: grid;
-            gap: 15px;
-        }
-
-        .option-btn {
-            background: white;
-            border: 2px solid #e0e0e0;
-            padding: 15px 20px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-        }
-
-        .option-btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            background-color: #f0f7ff;
-        }
-
-        .option-btn.correct {
-            background-color: var(--success) !important;
-            color: white !important;
-            border-color: var(--success) !important;
-        }
-
-        .option-btn.wrong {
-            background-color: var(--error) !important;
-            color: white !important;
-            border-color: var(--error) !important;
-        }
-
-        #feedback {
-            text-align: center;
-            height: 30px;
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        #controls {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .next-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            border-radius: 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            display: none;
-            transition: transform 0.2s;
-        }
-
-        .next-btn:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-        }
-
-        .result-screen {
-            text-align: center;
-            padding: 40px 0;
-        }
+        :root { --primary: #1e88e5; --success: #4caf50; --error: #f44336; --bg: #f5f7fa; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 650px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 30px; }
+        .header h1 { color: var(--primary); text-align: center; font-size: 22px; margin-bottom: 10px; }
+        .progress-container { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 25px; }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; border-radius: 4px; transition: 0.4s; }
+        .question-box { font-size: 1.2rem; color: #333; margin-bottom: 25px; text-align: center; min-height: 80px; }
+        .options-grid { display: grid; gap: 12px; }
+        .option-btn { background: white; border: 2px solid #e0e0e0; padding: 14px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; text-align: left; transition: 0.2s; }
+        .option-btn:hover { border-color: var(--primary); background: #f0f7ff; }
+        .option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .option-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        #feedback { text-align: center; font-weight: bold; margin-top: 20px; min-height: 25px; }
+        .next-btn { display: none; margin: 25px auto 0; padding: 12px 35px; background: var(--primary); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header">
         <h1>Toán 12: Nguyên hàm - Tích phân</h1>
-        <div id="stats">Câu hỏi 1/5</div>
+        <div id="stats" style="text-align:center; color:#777; font-size:14px; margin-bottom:5px;">Câu hỏi 1/3</div>
     </div>
-
-    <div class="progress-container">
-        <div id="progress-bar" class="progress-bar"></div>
-    </div>
-
+    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
     <div id="quiz-area">
-        <div class="question-box" id="question">
-            Đang tải câu hỏi...
-        </div>
-
-        <div class="options-grid" id="options">
-            </div>
-
+        <div class="question-box" id="question">Đang tải câu hỏi...</div>
+        <div class="options-grid" id="options"></div>
         <div id="feedback"></div>
-
-        <div id="controls">
-            <button id="next-btn" class="next-btn">Câu tiếp theo</button>
-        </div>
+        <button id="next-btn" class="next-btn">Câu tiếp theo</button>
     </div>
 </div>
 
 <script>
-    // DANH SÁCH CÂU HỎI
+    // Lưu ý: Dùng dấu \ để bắt đầu các lệnh như \int, \frac, \sin
     const quizData = [
+        const quizData = [
         {
-            q: "Tìm nguyên hàm của hàm số \( f(x) = \frac{1}{\cos^2 x} \)?",
-            options: ["\( \tan x + C \)", "\( -\tan x + C \)", "\( \cot x + C \)", "\( -\cot x + C \)"],
+            q: "Họ tất cả các nguyên hàm của hàm số \( f(x) = 3x^2 + \sin x \) là:",
+            options: ["\( x^3 - \cos x + C \)", "\( x^3 + \cos x + C \)", "\( 6x + \cos x + C \)", "\( 6x - \cos x + C \)" ],
             answer: 0
         },
         {
-            q: "Tính tích phân \( I = \int_0^1 (x^2 + 1) dx \)?",
-            options: ["\( \frac{4}{3} \)", "\( 1 \)", "\( \frac{2}{3} \)", "\( 2 \)"],
+            q: "Tính tích phân \( I = \int_1^2 \frac{1}{x} dx \):",
+            options: ["\( I = \ln 2 \)", "\( I = \log 2 \)", "\( I = 2 \)", "\( I = e^2 \)" ],
             answer: 0
         },
         {
-            q: "Tính nguyên hàm \( \int \frac{1}{x} dx \) trên khoảng \( (0; +\infty) \)?",
-            options: ["\( \ln x + C \)", "\( -\frac{1}{x^2} + C \)", "\( e^x + C \)", "\( \frac{1}{x^2} + C \)"],
+            q: "Cho \( \int_0^1 f(x)dx = 2 \) và \( \int_0^1 g(x)dx = 5 \). Tính \( \int_0^1 [f(x) - 2g(x)]dx \)?",
+            options: ["\( -3 \)", "\( 12 \)", "\( -8 \)", "\( 1 \)" ],
+            answer: 2
+        },
+        {
+            q: "Nguyên hàm của hàm số \( f(x) = e^{2x} \) là:",
+            options: ["\( 2e^{2x} + C \)", "\( \frac{1}{2}e^{2x} + C \)", "\( e^{2x} + C \)", "\( e^{2x} \ln 2 + C \)" ],
+            answer: 1
+        },
+        {
+            q: "Tính tích phân \( I = \int_0^{\pi/2} \sin x dx \):",
+            options: ["\( I = 0 \)", "\( I = -1 \)", "\( I = 1 \)", "\( I = \pi \)" ],
+            answer: 2
+        },
+        {
+            q: "Họ nguyên hàm của hàm số \( f(x) = \frac{1}{x+1} \) trên khoảng \( (-1; +\infty) \) là:",
+            options: ["\( \ln(x+1) + C \)", "\( \frac{1}{(x+1)^2} + C \)", "\( \ln |x+1| + C \)", "\( e^{x+1} + C \)" ],
             answer: 0
         },
         {
-            q: "Cho \( \int_0^2 f(x)dx = 3 \). Tính \( \int_0^2 2f(x)dx \)?",
-            options: ["\( 6 \)", "\( 3 \)", "\( 5 \)", "\( 1 \)"],
+            q: "Tính diện tích \( S \) của hình phẳng giới hạn bởi đồ thị hàm số \( y = x^2 \), trục hoành và hai đường thẳng \( x = 0, x = 3 \):",
+            options: ["\( S = 9 \)", "\( S = 27 \)", "\( S = 3 \)", "\( S = 6 \)" ],
             answer: 0
         },
         {
-            q: "Hàm số nào là một nguyên hàm của \( f(x) = e^x \)?",
-            options: ["\( e^x \)", "\( x e^{x-1} \)", "\( \frac{e^{x+1}}{x+1} \)", "\( e^{-x} \)"],
+            q: "Biết \( F(x) \) là một nguyên hàm của \( f(x) = 2x \) và \( F(1) = 3 \). Tìm \( F(x) \):",
+            options: ["\( x^2 + 3 \)", "\( x^2 + 2 \)", "\( x^2 + 1 \)", "\( 2x^2 + 1 \)" ],
+            answer: 1
+        },
+        {
+            q: "Tính tích phân \( I = \int_1^e x \ln x dx \) bằng phương pháp từng phần, đặt \( u = \ln x, dv = xdx \). Khi đó \( du \) là:",
+            options: ["\( \frac{1}{x} dx \)", "\( x dx \)", "\( \ln x dx \)", "\( \frac{x^2}{2} dx \)" ],
+            answer: 0
+        },
+        {
+            q: "Giá trị của tích phân \( \int_0^1 e^x dx \) là:",
+            options: ["\( e - 1 \)", "\( e \)", "\( 1 \)", "\( e + 1 \)" ],
             answer: 0
         }
     ];
+    ];
 
-    let currentIdx = 0;
+    let current = 0;
     let score = 0;
     let answered = false;
 
     function initQuiz() {
         answered = false;
-        const currentData = quizData[currentIdx];
-        
-        // Cập nhật thống kê
-        document.getElementById("stats").innerText = `Câu hỏi ${currentIdx + 1}/${quizData.length}`;
-        document.getElementById("progress-bar").style.width = `${((currentIdx + 1) / quizData.length) * 100}%`;
-        
-        // Hiển thị câu hỏi
-        document.getElementById("question").innerHTML = currentData.q;
+        const data = quizData[current];
+        document.getElementById("stats").innerText = `Câu hỏi ${current + 1}/${quizData.length}`;
+        document.getElementById("progress-bar").style.width = `${((current + 1)/quizData.length)*100}%`;
+        document.getElementById("question").innerHTML = data.q;
         document.getElementById("feedback").innerText = "";
         document.getElementById("next-btn").style.display = "none";
 
-        // Hiển thị đáp án
-        const optionsContainer = document.getElementById("options");
-        optionsContainer.innerHTML = "";
-        
-        currentData.options.forEach((opt, i) => {
+        const container = document.getElementById("options");
+        container.innerHTML = "";
+        data.options.forEach((opt, i) => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
-            btn.innerHTML = `<b style="margin-right:12px">${String.fromCharCode(65 + i)}.</b> ${opt}`;
-            btn.onclick = () => selectOption(i, btn);
-            optionsContainer.appendChild(btn);
+            btn.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+            btn.onclick = () => {
+                if(answered) return;
+                answered = true;
+                if(i === data.answer) {
+                    btn.classList.add("correct");
+                    document.getElementById("feedback").innerHTML = "<span style='color:var(--success)'>Chính xác! 🎉</span>";
+                    score++;
+                } else {
+                    btn.classList.add("wrong");
+                    container.children[data.answer].classList.add("correct");
+                    document.getElementById("feedback").innerHTML = "<span style='color:var(--error)'>Chưa đúng rồi!</span>";
+                }
+                document.getElementById("next-btn").style.display = "block";
+            };
+            container.appendChild(btn);
         });
 
-        // Gọi MathJax render lại công thức
         if (window.MathJax) {
             MathJax.typesetPromise();
         }
     }
 
-    function selectOption(idx, btn) {
-        if (answered) return;
-        answered = true;
-
-        const correctIdx = quizData[currentIdx].answer;
-        const allBtns = document.querySelectorAll(".option-btn");
-
-        if (idx === correctIdx) {
-            btn.classList.add("correct");
-            document.getElementById("feedback").innerHTML = "<span style='color:var(--success)'>Chính xác! 🎉</span>";
-            score++;
-        } else {
-            btn.classList.add("wrong");
-            allBtns[correctIdx].classList.add("correct");
-            document.getElementById("feedback").innerHTML = "<span style='color:var(--error)'>Rất tiếc, bạn đã chọn sai!</span>";
-        }
-
-        document.getElementById("next-btn").style.display = "inline-block";
-    }
-
     document.getElementById("next-btn").onclick = () => {
-        currentIdx++;
-        if (currentIdx < quizData.length) {
-            initQuiz();
-        } else {
-            showResult();
+        current++;
+        if(current < quizData.length) initQuiz();
+        else {
+            document.getElementById("quiz-area").innerHTML = `<div style="text-align:center; padding:30px;"><h2>Hoàn thành!</h2><p style="font-size:1.5rem">Điểm của bạn: ${score}/${quizData.length}</p><button onclick="location.reload()" class="next-btn" style="display:block">Làm lại</button></div>`;
         }
     };
-
-    function showResult() {
-        const area = document.getElementById("quiz-area");
-        area.innerHTML = `
-            <div class="result-screen">
-                <h2>Kết quả bài tập</h2>
-                <div style="font-size: 3rem; margin: 20px 0;">${score}/${quizData.length}</div>
-                <p>Bạn đã hoàn thành bài ôn tập này!</p>
-                <button onclick="location.reload()" class="next-btn" style="display:inline-block">Làm lại bài tập</button>
-            </div>
-        `;
-    }
 
     window.onload = initQuiz;
 </script>
