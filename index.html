@@ -1,175 +1,130 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Ôn Nguyên hàm – Tích phân</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn tập Nguyên hàm - Tích phân</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --primary: #2563eb; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 600px; border-radius: 16px; shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid #f1f5f9; margin-bottom: 20px; padding-bottom: 10px; }
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        #progress { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+        .question { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: grid; gap: 12px; }
+        .btn { padding: 15px; border: 2px solid #e2e8f0; border-radius: 12px; background: white; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s; display: flex; align-items: center; }
+        .btn:hover { border-color: var(--primary); background: #eff6ff; }
+        .btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .btn.wrong { background: var(--error); color: white; border-color: var(--error); }
+        #feedback { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
+    </style>
 </head>
 <body>
 
-<h1>🎮 ÔN TẬP NGUYÊN HÀM – TÍCH PHÂN</h1>
+<div class="card">
+    <div class="header">
+        <h2 style="margin:0; color: var(--primary);">Toán 12: Nguyên hàm - Tích phân</h2>
+        <p id="stats" style="color: #64748b; font-size: 0.9rem; margin: 5px 0;">Câu hỏi 1/2</p>
+    </div>
+    
+    <div class="progress-bar"><div id="progress"></div></div>
 
-<div id="game"></div>
+    <div id="quiz-box">
+        <div class="question" id="q-text">Đang tải câu hỏi...</div>
+        <div class="options" id="q-options"></div>
+        <div id="feedback"></div>
+        <button id="next-btn" style="display:none; margin-top:20px; width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Câu tiếp theo</button>
+    </div>
+</div>
 
-<p id="score"></p>
+<script>
+    const questions = [
+        {
+            q: "Tính nguyên hàm \( \int e^x dx \)?",
+            options: ["\( e^x + C \)", "\( -e^x + C \)", "\( \frac{e^{x+1}}{x+1} + C \)", "\( xe^x + C \)"],
+            answer: 0
+        },
+        {
+            q: "Tính tích phân \( I = \int_1^2 \frac{1}{x} dx \)?",
+            options: ["\( \ln 2 \)", "\( e^2 \)", "\( 1 \)", "\( \ln 1 \)"],
+            answer: 0
+        },
+        {
+            q: "Hàm số nào sau đây là một nguyên hàm của \( f(x) = \sin x \)?",
+            options: ["\( \cos x \)", " \( -\cos x \)", "\( \frac{1}{\cos x} \)", "\( \sin^2 x \)"],
+            answer: 1
+        }
+    ];
 
-<script src="script.js"></script>
+    let current = 0;
+    let score = 0;
+    let canClick = true;
+
+    function loadQuestion() {
+        canClick = true;
+        const q = questions[current];
+        document.getElementById("q-text").innerHTML = q.q;
+        document.getElementById("stats").innerText = `Câu hỏi ${current + 1}/${questions.length}`;
+        document.getElementById("progress").style.width = `${((current + 1) / questions.length) * 100}%`;
+        document.getElementById("feedback").innerText = "";
+        document.getElementById("next-btn").style.display = "none";
+        
+        const optionsContainer = document.getElementById("q-options");
+        optionsContainer.innerHTML = "";
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerHTML = `<span style="margin-right:10px; font-weight:bold;">${String.fromCharCode(65 + i)}.</span> ${opt}`;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsContainer.appendChild(btn);
+        });
+
+        if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function checkAnswer(idx, btn) {
+        if (!canClick) return;
+        canClick = false;
+        const correctIdx = questions[current].answer;
+        const allBtns = document.querySelectorAll(".btn");
+
+        if (idx === correctIdx) {
+            btn.classList.add("correct");
+            document.getElementById("feedback").innerHTML = "<span style='color:var(--success)'>Chính xác! 🎉</span>";
+            score++;
+        } else {
+            btn.classList.add("wrong");
+            allBtns[correctIdx].classList.add("correct");
+            document.getElementById("feedback").innerHTML = "<span style='color:var(--error)'>Rất tiếc, chưa đúng!</span>";
+        }
+        document.getElementById("next-btn").style.display = "block";
+    }
+
+    document.getElementById("next-btn").onclick = () => {
+        current++;
+        if (current < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        const box = document.getElementById("quiz-box");
+        box.innerHTML = `
+            <div style="text-align:center; padding: 20px;">
+                <h3 style="font-size:1.5rem;">Hoàn thành!</h3>
+                <p style="font-size:1.2rem;">Bạn đạt được <strong>${score}/${questions.length}</strong> điểm.</p>
+                <button onclick="location.reload()" style="padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Làm lại bài tập</button>
+            </div>
+        `;
+    }
+
+    window.onload = loadQuestion;
+</script>
 </body>
 </html>
-body {
-  font-family: Arial, sans-serif;
-  background: #eef2ff;
-  text-align: center;
-  padding: 20px;
-}
-
-h1 {
-  color: #1e3a8a;
-}
-
-button {
-  margin: 6px;
-  padding: 8px 14px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-input {
-  padding: 6px;
-  font-size: 15px;
-}
-let round = 1;
-let index = 0;
-let score = 0;
-
-/* ========== VÒNG 1: TRẮC NGHIỆM ========== */
-const round1 = [
- {q:"Nguyên hàm của x^3 là:", options:["x^4+C","x^4/4+C","3x^2+C","x^3/3+C"], a:1},
- {q:"∫ 2x dx =", options:["x^2+C","2x^2+C","x+C","2x+C"], a:0},
- {q:"Nguyên hàm của cos x là:", options:["-sin x+C","cos x+C","sin x+C","-cos x+C"], a:2},
- {q:"∫ 1/x dx (x>0) =", options:["ln x+C","ln|x|+C","1/x^2+C","x+C"], a:0},
- {q:"Nguyên hàm của e^x là:", options:["xe^x+C","e^x+C","ln x+C","x+C"], a:1},
- {q:"∫(3x^2−4)dx =", options:["x^3−4x+C","3x^3−4+C","x^3−4+C","6x−4+C"], a:0},
- {q:"Nếu F'(x)=f(x) thì F(x) là:", options:["Đạo hàm","Tích phân","Nguyên hàm","Đồ thị"], a:2},
- {q:"∫x⁻² dx =", options:["−x⁻¹+C","x⁻¹+C","−2x⁻¹+C","ln x+C"], a:0},
- {q:"Nguyên hàm của 2x+1 là:", options:["x^2+x+C","2x^2+x+C","x^2+1+C","2x+1+C"], a:0},
- {q:"∫ sin x dx =", options:["cos x+C","−sin x+C","−cos x+C","sin x+C"], a:2},
- {q:"Tập hợp các nguyên hàm gọi là:", options:["Tích phân","Họ nguyên hàm","Hàm liên tục","Hàm sơ cấp"], a:1},
- {q:"∫0 dx =", options:["0","1","x","C"], a:3}
-];
-
-function showRound1() {
-  let q = round1[index];
-  let html = `<h2>Vòng 1 – Trắc nghiệm</h2><p>Câu ${index+1}. ${q.q}</p>`;
-  q.options.forEach((o,i)=>{
-    html += `<button onclick="check1(${i})">${o}</button><br>`;
-  });
-  document.getElementById("game").innerHTML = html;
-}
-
-function check1(c){
-  if(c===round1[index].a) score++;
-  index++;
-  index<round1.length ? showRound1() : nextRound();
-}
-
-/* ========== VÒNG 2: ĐÚNG / SAI ========== */
-const round2 = [
- {
-  q:"Cho f(x)=x²",
-  i:[
-   {t:"Một nguyên hàm là x³/3 + C",c:true},
-   {t:"∫f(x)dx = x³ + C",c:false},
-   {t:"f(x) có vô số nguyên hàm",c:false},
-   {t:"f(x) liên tục trên R",c:true}
-  ]
- },
- {
-  q:"Xét các mệnh đề sau",
-  i:[
-   {t:"F'(x)=f(x) ⇒ F(x) là nguyên hàm",c:true},
-   {t:"Hai nguyên hàm hơn kém nhau hằng số",c:true},
-   {t:"∫cos x dx = −sin x + C",c:false},
-   {t:"∫e^x dx = e^x + C",c:true}
-  ]
- },
- {
-  q:"Cho f(x)=1/x (x>0)",
-  i:[
-   {t:"Một nguyên hàm là ln x + C",c:true},
-   {t:"f(x) không có nguyên hàm",c:false},
-   {t:"∫f(x)dx = ln|x| + C",c:false},
-   {t:"f(x) liên tục trên (0;+∞)",c:true}
-  ]
- },
- {
-  q:"Xét các tích phân",
-  i:[
-   {t:"∫(x+1)dx = x²/2 + x + C",c:true},
-   {t:"∫2x dx = x² + C",c:true},
-   {t:"∫sin x dx = cos x + C",c:false},
-   {t:"∫5 dx = 5x + C",c:true}
-  ]
- }
-];
-
-function showRound2(){
- let q=round2[index];
- let html=`<h2>Vòng 2 – Đúng / Sai</h2><p>${q.q}</p>`;
- q.i.forEach((x,i)=>{
-  html+=`<label><input type="checkbox" id="r2${i}"> ${"abcd"[i]}. ${x.t}</label><br>`;
- });
- html+=`<button onclick="check2()">Nộp</button>`;
- document.getElementById("game").innerHTML=html;
-}
-
-function check2(){
- let q=round2[index];
- q.i.forEach((x,i)=>{
-  if(document.getElementById(`r2${i}`).checked===x.c) score++;
- });
- index++;
- index<round2.length ? showRound2() : nextRound();
-}
-
-/* ========== VÒNG 3: TRẢ LỜI NGẮN ========== */
-const round3 = [
- {q:"∫4x dx =",a:"2x^2+C"},
- {q:"Nguyên hàm của 3x² là:",a:"x^3+C"},
- {q:"∫e^x dx =",a:"e^x+C"},
- {q:"∫cos x dx =",a:"sin x+C"},
- {q:"∫1/x dx (x>0) =",a:"lnx+C"},
- {q:"F'(x)=2x−1. Tìm F(x)",a:"x^2-x+C"}
-];
-
-function showRound3(){
- let q=round3[index];
- document.getElementById("game").innerHTML=
- `<h2>Vòng 3 – Trả lời ngắn</h2>
- <p>${q.q}</p>
- <input id="short">
- <button onclick="check3()">Trả lời</button>`;
-}
-
-function check3(){
- let u=document.getElementById("short").value.replace(/\s/g,"");
- let c=round3[index].a.replace(/\s/g,"");
- if(u===c) score++;
- index++;
- index<round3.length ? showRound3() : endGame();
-}
-
-/* ========== ĐIỀU KHIỂN ========== */
-function nextRound(){
- index=0;
- round++;
- if(round===2) showRound2();
- else if(round===3) showRound3();
-}
-
-function endGame(){
- document.getElementById("game").innerHTML=
- `<h2>🎉 Hoàn thành!</h2><p>Điểm của bạn: ${score}</p>`;
-}
-
-showRound1();
